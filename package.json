@@ -1,0 +1,20 @@
+{
+  "name": "my-turbo-app",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "db:generate": "turbo run prisma:generate --filter=@my-turbo/db",
+    "db:migrate": "turbo run prisma:migrate --filter=@my-turbo/db"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.4",
+    "jest": "^30.2.0",
+    "turbo": "^2.5.8",
+    "typescript": "~6.0.2"
+  }
+}
