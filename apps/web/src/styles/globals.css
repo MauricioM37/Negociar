@@ -1,0 +1,169 @@
+/* apps/web/src/styles/globals.css */
+
+/* Paleta de colores Mercado Libre (ML) a través de variables CSS */
+:root {
+  --ml-blue: #2563EB;
+  --ml-green: #10B981;
+  --ml-yellow: #FBBF24;
+  --ml-red: #EF4444;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased bg-gray-50 text-gray-700;
+    font-family: 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  a {
+    @apply no-underline;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Header gradient background */
+  .nav-gradient {
+    background: linear-gradient(90deg, var(--ml-blue), var(--ml-green));
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white font-semibold px-6 py-3 rounded-md transition-all duration-200;
+    @apply hover:bg-blue-700 hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-gray-700 border-2 border-gray-200 font-semibold px-6 py-3 rounded-md transition-all duration-200;
+    @apply hover:border-gray-300 hover:shadow-md;
+  }
+
+  .input-search {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-md transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:shadow-md;
+  }
+
+  .card-product {
+    @apply bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300;
+    @apply hover:shadow-lg hover:-translate-y-1;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold;
+  }
+
+  .badge-new {
+    @apply bg-green-600 text-white;
+  }
+
+  .badge-discount {
+    @apply bg-red-500 text-white;
+  }
+
+  .badge-stock {
+    @apply bg-yellow-400 text-gray-900;
+  }
+
+  .skeleton {
+    @apply bg-gray-200 rounded animate-pulse;
+  }
+
+  /* Category circle styling for modern cat chips */
+  .category-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--ml-blue), var(--ml-green));
+    color: white;
+    font-size: 28px;
+    box-shadow: 0 6px 14px rgba(0,0,0,.12);
+  }
+}
+
+@layer utilities {
+  .bg-ml-blue { background-color: var(--ml-blue); }
+  .text-ml-blue { color: var(--ml-blue); }
+  .bg-ml-green { background-color: var(--ml-green); }
+  .text-ml-green { color: var(--ml-green); }
+  .bg-ml-yellow { background-color: var(--ml-yellow); }
+  .text-ml-yellow { color: var(--ml-yellow); }
+  .bg-ml-red { background-color: var(--ml-red); }
+  .text-ml-red { color: var(--ml-red); }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-ml-blue to-ml-green;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Header base and transitions */
+.site-header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.4s ease, color 0.4s ease, box-shadow 0.4s ease;
+  backdrop-filter: saturate(1.2) blur(6px);
+}
+.site-header.header-top {
+  background: rgba(15,23,42,0.75);
+  color: #fff;
+}
+.site-header.header-scrolled {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+}
+/* Ensure links in sticky header adapt to light background */
+.site-header.header-scrolled a { color: #111827 !important; }
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* Card stagger animation */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
