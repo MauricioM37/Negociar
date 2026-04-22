@@ -1,7 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
-import { AuthLayout } from './layouts/AuthLayout';
 import { HomePage } from './pages/Home';
 import { CatalogPage } from './pages/Catalog';
 import { authService } from './services/authService';
@@ -71,15 +70,15 @@ const CartPage = () => {
                   <button
                     type="button"
                     onClick={() => updateQuantity(product.id, quantity - 1)}
-                    className="w-8 h-8 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100"
                   >
                     -
                   </button>
-                  <span className="min-w-6 text-center font-semibold text-gray-800">{quantity}</span>
+                  <span className="min-w-6 text-center font-semibold">{quantity}</span>
                   <button
                     type="button"
                     onClick={() => updateQuantity(product.id, quantity + 1)}
-                    className="w-8 h-8 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors"
+                    className="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100"
                   >
                     +
                   </button>
@@ -99,10 +98,8 @@ const CartPage = () => {
             <span className="text-gray-600 font-medium">Total</span>
             <span className="text-2xl font-bold text-ml-blue">{formatPrice(totalPrice)}</span>
           </div>
-          <button
-            type="button"
-            className="w-full py-3 bg-[#001D3D] text-white rounded-lg font-semibold hover:bg-blue-900 transition-colors"
-          >
+
+          <button className="w-full py-3 bg-[#001D3D] text-white rounded-lg font-semibold hover:bg-blue-900">
             Proceder al pago
           </button>
         </div>
@@ -114,13 +111,16 @@ const CartPage = () => {
 const LoginPage = () => {
   const navigate = useNavigate();
   const onLogin = useAuthStore((state) => state.login);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     setError(null);
     setLoading(true);
 
@@ -137,63 +137,60 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all">
+      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-card">
+
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-ml-yellow rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-ml-blue font-bold text-2xl">N</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">¡Hola! Bienvenido de nuevo</h1>
-          <p className="text-gray-500 mt-2">Ingresá tu email y contraseña</p>
+
+          <h1 className="text-2xl font-bold text-gray-800">
+            ¡Hola! Bienvenido de nuevo
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Ingresá tu email y contraseña
+          </p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ml-blue focus:border-transparent"
-              required
-            />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ml-blue focus:border-transparent"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="tu@email.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="w-full px-4 py-3 border rounded-lg"
+            required
+          />
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="w-full px-4 py-3 border rounded-lg"
+            required
+          />
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"
-            className="w-full py-3 bg-ml-blue text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-70"
+            className="w-full py-3 bg-ml-blue text-white rounded-lg font-semibold"
             disabled={loading}
           >
             {loading ? 'Ingresando...' : 'Continuar'}
           </button>
+
         </form>
 
-        <div className="mt-6 text-center">
-          <a href="#" className="text-sm text-ml-blue hover:underline">
-            ¿Olvidaste tu contraseña?
-          </a>
-        </div>
-
-        <div className="mt-8 pt-6 border-t text-center">
-          <p className="text-gray-500 text-sm">¿No tenés cuenta?</p>
+        <div className="mt-8 text-center">
           <Link to="/register" className="text-ml-blue font-semibold hover:underline">
             Crear cuenta
           </Link>
         </div>
+
       </div>
     </div>
   );
@@ -202,14 +199,17 @@ const LoginPage = () => {
 const RegisterPage = () => {
   const navigate = useNavigate();
   const onLogin = useAuthStore((state) => state.login);
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     setError(null);
     setLoading(true);
 
@@ -226,117 +226,88 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-card hover:shadow-card-hover transition-all">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-ml-yellow rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-ml-blue font-bold text-2xl">N</span>
-          </div>
-          <h1 className="text-2xl font-bold text-gray-800">Crear cuenta</h1>
-          <p className="text-gray-500 mt-2">Es gratis y tardás menos de 2 minutos</p>
-        </div>
+
+      <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-card">
+
+        <h1 className="text-2xl font-bold text-center mb-6">
+          Crear cuenta
+        </h1>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input
-              type="text"
-              placeholder="Tu nombre"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ml-blue focus:border-transparent"
-              required
-            />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              placeholder="tu@email.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ml-blue focus:border-transparent"
-              required
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Tu nombre"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            className="w-full px-4 py-3 border rounded-lg"
+            required
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ml-blue focus:border-transparent"
-              required
-            />
-          </div>
+          <input
+            type="email"
+            placeholder="tu@email.com"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="w-full px-4 py-3 border rounded-lg"
+            required
+          />
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className="w-full px-4 py-3 border rounded-lg"
+            required
+          />
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"
-            className="w-full py-3 bg-ml-blue text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-70"
+            className="w-full py-3 bg-ml-blue text-white rounded-lg font-semibold"
             disabled={loading}
           >
-            {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+            {loading ? 'Creando...' : 'Crear cuenta'}
           </button>
+
         </form>
 
-        <div className="mt-6 text-center text-xs text-gray-400">
-          <p>Al continuar, aceptás nuestros Términos y Condiciones</p>
-        </div>
       </div>
     </div>
   );
 };
 
-const SellerPage = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    <div className="text-center">
-      <div className="text-6xl mb-4">💼</div>
-      <h1 className="text-3xl font-bold text-gray-800 mb-4">Vende con nosotros</h1>
-      <p className="text-gray-500 max-w-md mx-auto mb-6">
-        Unite a miles de vendedores que ya están creciendo con Negociar. 
-        Es fácil, rápido y sin costo de publicación.
-      </p>
-      <a href="/register" className="btn-primary inline-block">
-        Empezar a vender
-      </a>
-    </div>
-  </div>
-);
-
 function App() {
   return (
     <Routes>
+
       <Route element={<MainLayout />}>
+
         <Route path="/" element={<HomePage />} />
+
         <Route path="/catalog" element={<CatalogPage />} />
+
         <Route path="/product/:id" element={<ProductDetailPage />} />
+
         <Route path="/cart" element={<CartPage />} />
+
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route path="/register" element={<RegisterPage />} />
+
         <Route
           path="/seller"
-          element={(
-            <ProtectedRoute requiredRole="seller">
-              <SellerPage />
-            </ProtectedRoute>
-          )}
-        />
-        <Route
-          path="/seller/dashboard"
-          element={(
+          element={
             <ProtectedRoute requiredRole="seller">
               <SellerDashboard />
             </ProtectedRoute>
-          )}
+          }
         />
+
       </Route>
 
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Route>
     </Routes>
   );
 }

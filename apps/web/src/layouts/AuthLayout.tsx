@@ -2,14 +2,7 @@
 
 import { Outlet } from 'react-router-dom'
 
-/**
- * LAYOUT: AuthLayout
- * 
- * ACTUAL: Layout simple para login/register
- *         - Fondo con gradiente
- *         - Logo grande
- *         - Links de ayuda
- */
+
 export const AuthLayout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

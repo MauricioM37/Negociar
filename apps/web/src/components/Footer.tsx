@@ -2,15 +2,7 @@
 
 import { Link } from 'react-router-dom'
 
-/**
- * COMPONENTE: Footer
- * 
- * ACTUAL: Footer informativo simple
- *         - Links a redes sociales
- *         - Newsletter subscription
- *         - Métodos de pago
- *         - Certificados de seguridad
- */
+
 export const Footer = () => {
   return (
     <footer className="bg-white border-t border-gray-100 pt-16 pb-8">

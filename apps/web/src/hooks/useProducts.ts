@@ -4,20 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { productService } from '../services/productService';
 import type { Product, ProductCatalogQuery } from '../types';
 
-/**
- * CUSTOM HOOK: useFeaturedProducts
- * 
- * Este hook encapsula toda la lógica de fetching de productos destacados.
- * 
- * IMPORTANTE: Este patrón es el RECOMENDADO por React para fetching de datos.
- * La documentación oficial dice: "You can fetch data with Effects"
- * (https://react.dev/learn/you-might-not-need-an-effect#fetching-data)
- * 
- * La advertencia "calling setState synchronously" NO aplica aquí porque:
- * 1. El setState ocurre DENTRO de una función asíncrona (fetchProducts)
- * 2. No se actualiza estado durante el render, sino después de resolver la promesa
- * 3. Es el patrón estándar para datos externos
- */
+
 export const useFeaturedProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
