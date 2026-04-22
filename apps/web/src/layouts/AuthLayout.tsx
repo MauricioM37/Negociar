@@ -6,7 +6,6 @@ import { Outlet } from 'react-router-dom'
  * LAYOUT: AuthLayout
  * 
  * ACTUAL: Layout simple para login/register
- * FUTURO: Podría incluir:
  *         - Fondo con gradiente
  *         - Logo grande
  *         - Links de ayuda

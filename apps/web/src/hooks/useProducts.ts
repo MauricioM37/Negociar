@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { productService } from '../services/productService';
-import type { Product } from '../types';
+import type { Product, ProductCatalogQuery } from '../types';
 
 /**
  * CUSTOM HOOK: useFeaturedProducts
@@ -78,7 +78,6 @@ export const useProductsByCategory = (category: string) => {
 
 /**
  * Custom hook para búsqueda de productos con debounce
- * FUTURO: Aquí se integrará la búsqueda con IA
  */
 export const useSearchProducts = (searchQuery: string) => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -123,4 +122,30 @@ export const useSearchProducts = (searchQuery: string) => {
   }, [searchQuery]);
 
   return { products, loading, error };
+};
+
+export const useCatalogProducts = (query: ProductCatalogQuery) => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await productService.getAll(query);
+      setProducts(data);
+    } catch (err) {
+      setError('Error al cargar productos del catálogo');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [query.search, query.category, query.minPrice, query.maxPrice, query.sortBy]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  return { products, loading, error, refetch: fetchProducts };
 };

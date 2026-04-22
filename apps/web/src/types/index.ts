@@ -3,8 +3,6 @@
 /**
  * TIPO: Producto principal del marketplace
  * 
- * ACTUAL: Mockeado desde src/mock/products.ts
- * FUTURO: Vendrá de la API REST (GET /api/products)
  */
 export interface Product {
   id: string;
@@ -17,6 +15,7 @@ export interface Product {
   stock: number;
   seller: string;
   rating: number;
+  ownerId?: number | null;
 }
 
 /**
@@ -34,5 +33,16 @@ export interface SearchFilters {
   category?: string;
   minPrice?: number;
   maxPrice?: number;
-  sortBy?: 'price_asc' | 'price_desc' | 'rating';
+  sortBy?: 'relevance' | 'price_asc' | 'price_desc' | 'rating';
+}
+
+export type ProductSortOption = 'relevance' | 'price_asc' | 'price_desc' | 'rating';
+
+export interface ProductCatalogQuery {
+  search?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sortBy?: ProductSortOption;
+  ownerId?: number;
 }

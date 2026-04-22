@@ -8,7 +8,6 @@ import { Footer } from '../components/Footer'
  * LAYOUT: MainLayout
  * 
  * ACTUAL: Layout completo con Navbar y Footer
- * FUTURO: Podría incluir:
  *         - Sidebar para filtros avanzados
  *         - Banner de promociones
  *         - Chat de atención al cliente

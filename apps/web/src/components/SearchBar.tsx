@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
-import { searchSuggestions } from '../mocks/products';
+import { searchSuggestions } from '../constants/catalog';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -20,6 +20,10 @@ export const SearchBar = ({
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setQuery(initialValue);
+  }, [initialValue]);
 
   useEffect(() => {
     if (query.length > 0) {

@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
-import { mockProducts, categories } from '../mocks/products';
+import { categories } from '../constants/catalog';
+import { useCatalogProducts } from '../hooks/useProducts';
 
 type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'rating';
 
@@ -11,16 +12,9 @@ export const CatalogPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1500000]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
   const initialSearch = searchParams.get('search') || '';
   const initialCategory = searchParams.get('category') || '';
-
-  useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 400);
-    return () => clearTimeout(timer);
-  }, [initialSearch, initialCategory, sortBy]);
+  const isAiSearchActive = Boolean(initialSearch.trim());
 
   useEffect(() => {
     if (initialCategory) {
@@ -28,73 +22,44 @@ export const CatalogPage = () => {
     }
   }, [initialCategory]);
 
-  const filteredProducts = useMemo(() => {
-    let products = [...mockProducts];
+  const catalogQuery = useMemo(
+    () => ({
+      search: initialSearch || undefined,
+      category: selectedCategory || undefined,
+      minPrice: priceRange[0],
+      maxPrice: priceRange[1],
+      sortBy,
+    }),
+    [initialSearch, selectedCategory, priceRange, sortBy],
+  );
 
-    if (initialSearch) {
-      const search = initialSearch.toLowerCase();
-      products = products.filter(
-        p =>
-          p.title.toLowerCase().includes(search) ||
-          p.description.toLowerCase().includes(search) ||
-          p.category.toLowerCase().includes(search) ||
-          p.seller.toLowerCase().includes(search)
-      );
-    }
-
-    if (selectedCategory) {
-      const categoryMap: Record<string, string> = {
-        electronica: 'electrónica',
-        hogar: 'hogar',
-        moda: 'moda',
-        libros: 'libros',
-        deportes: 'deportes',
-        vehiculos: 'vehículos',
-        juegos: 'juegos',
-        belleza: 'belleza',
-      };
-      const catLower = categoryMap[selectedCategory] || selectedCategory.toLowerCase();
-      products = products.filter(p => p.category.toLowerCase().includes(catLower));
-    }
-
-    products = products.filter(
-      p => p.price >= priceRange[0] && p.price <= priceRange[1]
-    );
-
-    switch (sortBy) {
-      case 'price_asc':
-        products.sort((a, b) => a.price - b.price);
-        break;
-      case 'price_desc':
-        products.sort((a, b) => b.price - a.price);
-        break;
-      case 'rating':
-        products.sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        break;
-    }
-
-    return products;
-  }, [initialSearch, selectedCategory, priceRange, sortBy]);
+  const {
+    products: catalogProducts,
+    loading: isLoading,
+    error,
+  } = useCatalogProducts(catalogQuery);
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId === selectedCategory ? null : categoryId);
+    const updatedParams = new URLSearchParams(searchParams);
+
     if (categoryId === selectedCategory) {
-      searchParams.delete('category');
+      updatedParams.delete('category');
     } else {
-      searchParams.set('category', categoryId);
+      updatedParams.set('category', categoryId);
     }
-    setSearchParams(searchParams);
+
+    setSearchParams(updatedParams);
   };
 
   const clearFilters = () => {
     setSelectedCategory(null);
     setPriceRange([0, 1500000]);
     setSortBy('relevance');
-    searchParams.delete('search');
-    searchParams.delete('category');
-    setSearchParams(searchParams);
+    const updatedParams = new URLSearchParams(searchParams);
+    updatedParams.delete('search');
+    updatedParams.delete('category');
+    setSearchParams(updatedParams);
   };
 
   const formatPrice = (price: number) => {
@@ -120,8 +85,13 @@ export const CatalogPage = () => {
                     : 'Todos los productos'
                 }
               </h1>
+              {isAiSearchActive && (
+                <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
+                  ✨ Búsqueda Inteligente
+                </span>
+              )}
               <p className="text-sm text-gray-500 mt-1">
-                {filteredProducts.length} productos encontrados
+                {catalogProducts.length} productos encontrados
               </p>
             </div>
             
@@ -282,19 +252,40 @@ export const CatalogPage = () => {
           {/* Products Grid */}
           <main className="flex-1">
             {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(9)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg overflow-hidden">
-                    <div className="aspect-square bg-gray-200 animate-pulse" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded animate-pulse" />
-                      <div className="h-6 bg-gray-200 rounded animate-pulse w-1/2" />
-                      <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
-                    </div>
+              <>
+                {isAiSearchActive && (
+                  <div className="mb-4 p-3 rounded-lg border border-indigo-100 bg-indigo-50 text-indigo-700 text-sm">
+                    ✨ Analizando intención con IA y rankeando resultados...
                   </div>
-                ))}
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {[...Array(9)].map((_, i) => (
+                    <div key={i} className="bg-white rounded-lg overflow-hidden">
+                      <div className="aspect-square bg-gray-200 animate-pulse" />
+                      <div className="p-4 space-y-3">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                        <div className="h-6 bg-gray-200 rounded animate-pulse w-1/2" />
+                        <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : error ? (
+              <div className="text-center py-16">
+                <div className="text-6xl mb-4">⚠️</div>
+                <h2 className="text-xl font-bold text-gray-800 mb-2">
+                  Ocurrió un error al cargar productos
+                </h2>
+                <p className="text-gray-500 mb-6">{error}</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-3 bg-ml-blue text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+                >
+                  Reintentar
+                </button>
               </div>
-            ) : filteredProducts.length === 0 ? (
+            ) : catalogProducts.length === 0 ? (
               <div className="text-center py-16">
                 <div className="text-6xl mb-4">🔍</div>
                 <h2 className="text-xl font-bold text-gray-800 mb-2">
@@ -312,7 +303,7 @@ export const CatalogPage = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product, index) => (
+                {catalogProducts.map((product, index) => (
                   <ProductCard
                     key={product.id}
                     product={product}

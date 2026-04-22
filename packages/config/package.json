@@ -1,11 +1,10 @@
 {
-  "name": "@my-turbo/config",
+  "name": "@Negociar/config",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "exports": {
     "./eslint/base": "./eslint/base.js",
-    "./jest/base.cjs": "./jest/base.cjs",
     "./tsconfig/base.json": "./tsconfig/base.json"
   },
   "dependencies": {
@@ -15,7 +14,6 @@
   },
   "peerDependencies": {
     "eslint": "^9.0.0",
-    "jest": "^30.0.0",
     "typescript": ">=5"
   }
 }

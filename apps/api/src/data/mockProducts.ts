@@ -1,11 +1,12 @@
-import type { Product } from '../types';
+import type { Product } from '../types/product';
 
 export const mockProducts: Product[] = [
   {
     id: '1',
     title: 'iPhone 15 Pro Max 256GB Titanio Negro',
     price: 1099990,
-    description: 'El iPhone más potente jamás creado. Chip A17 Pro, cámara de 48MP, pantalla Super Retina XDR de 6.7". Incluye cable USB-C y manual.',
+    description:
+      'El iPhone más potente jamás creado. Chip A17 Pro, cámara de 48MP, pantalla Super Retina XDR de 6.7". Incluye cable USB-C y manual.',
     image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&h=400&fit=crop',
     category: 'Electrónica',
     stock: 12,
@@ -17,7 +18,8 @@ export const mockProducts: Product[] = [
     id: '2',
     title: 'Samsung Galaxy S24 Ultra 512GB Titanium Gray',
     price: 899990,
-    description: ' smartphone definitivo con S Pen integrado. Pantalla Dynamic AMOLED 2X de 6.8", cámara de 200MP, Galaxy AI integrado.',
+    description:
+      'smartphone definitivo con S Pen integrado. Pantalla Dynamic AMOLED 2X de 6.8", cámara de 200MP, Galaxy AI integrado.',
     image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&h=400&fit=crop',
     category: 'Electrónica',
     stock: 8,
@@ -29,19 +31,21 @@ export const mockProducts: Product[] = [
     id: '3',
     title: 'MacBook Pro 14" M3 Pro 18GB 512GB',
     price: 1349990,
-    description: 'Potencia profesional en formato portátil. Chip M3 Pro, Neural Engine, pantalla Liquid Retina XDR, hasta 22 horas de batería.',
+    description:
+      'Potencia profesional en formato portátil. Chip M3 Pro, Neural Engine, pantalla Liquid Retina XDR, hasta 22 horas de batería.',
     image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&h=400&fit=crop',
     category: 'Electrónica',
     stock: 5,
     seller: 'Apple Official Store',
     rating: 4.9,
   },
-{
+  {
     id: '4',
     title: 'Sony WH-1000XM5 Auriculares Noise Cancelling',
     price: 249990,
-    description: 'La mejor cancelación de ruido del mundo. 30 horas de batería, LDAC, DSEE Extreme, conexión multipunto. Negro grafito.',
-image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg&wid=330&bgcolor=FFFFFF&bgc=FFFFFF',
+    description:
+      'La mejor cancelación de ruido del mundo. 30 horas de batería, LDAC, DSEE Extreme, conexión multipunto. Negro grafito.',
+    image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg&wid=330&bgcolor=FFFFFF&bgc=FFFFFF',
     category: 'Electrónica',
     stock: 25,
     seller: 'Sony Center Argentina',
@@ -52,7 +56,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '5',
     title: 'Nike Air Max 270 React Running',
     price: 89990,
-    description: 'Máxima comodidad y estilo. Unit Air Max en el talón, tecnología React en la mediasuela, tela transpirable.',
+    description:
+      'Máxima comodidad y estilo. Unit Air Max en el talón, tecnología React en la mediasuela, tela transpirable.',
     image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=400&fit=crop',
     category: 'Deportes',
     stock: 45,
@@ -64,7 +69,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '6',
     title: 'Adidas Ultraboost 22 Zapatillas Running',
     price: 79990,
-    description: 'Máxima energía en cada paso. Tecnología Boost, Tornillo Continental, talié de soporte. Color Core Black.',
+    description:
+      'Máxima energía en cada paso. Tecnología Boost, Tornillo Continental, talié de soporte. Color Core Black.',
     image: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&h=400&fit=crop',
     category: 'Deportes',
     stock: 30,
@@ -75,7 +81,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '7',
     title: 'Kindle Paperwhite 11th Generation 8GB',
     price: 89990,
-    description: 'La experiencia de lectura perfecta. Pantalla de 6.8", luz ajustable, resistente al agua. Incluye funda de piel.',
+    description:
+      'La experiencia de lectura perfecta. Pantalla de 6.8", luz ajustable, resistente al agua. Incluye funda de piel.',
     image: 'https://images.fravega.com/f300/df47ebea1169df13043b72d6c4d331e1.jpg.webp',
     category: 'Libros',
     stock: 18,
@@ -87,7 +94,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '8',
     title: 'Clean Code - Robert C. Martin',
     price: 15990,
-    description: 'El libro esencial para desarrolladores. Principios, patrones y prácticas ágiles para escribir código limpio.',
+    description:
+      'El libro esencial para desarrolladores. Principios, patrones y prácticas ágiles para escribir código limpio.',
     image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&h=400&fit=crop',
     category: 'Libros',
     stock: 50,
@@ -98,7 +106,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '9',
     title: 'PlayStation 5 Standard + FIFA 24',
     price: 699990,
-    description: 'La consola de nueva generación. SSD de 825GB, ray tracing, mando DualSense, incluye FIFA 24.',
+    description:
+      'La consola de nueva generación. SSD de 825GB, ray tracing, mando DualSense, incluye FIFA 24.',
     image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=600&h=400&fit=crop',
     category: 'Electrónica',
     stock: 3,
@@ -109,7 +118,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '10',
     title: 'Smart TV Samsung 65" QLED 4K Q80C',
     price: 799990,
-    description: 'Televisor premium con procesamiento IA. Neural Quantum Processor 4K, Direct Full Array, Object Sound Tracking, Gaming Hub.',
+    description:
+      'Televisor premium con procesamiento IA. Neural Quantum Processor 4K, Direct Full Array, Object Sound Tracking, Gaming Hub.',
     image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=600&h=400&fit=crop',
     category: 'Electrónica',
     stock: 10,
@@ -121,7 +131,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '11',
     title: 'Estufa Eléctrica Twin Torque 2000W',
     price: 34990,
-    description: 'Calor instantáneo y seguro. Termostato regulable, protección antivolcamiento, sistema de ahorro energético.',
+    description:
+      'Calor instantáneo y seguro. Termostato regulable, protección antivolcamiento, sistema de ahorro energético.',
     image: 'https://mandyhogar.com.ar/wp-content/uploads/2022/05/Estufa-de-cuarzo-tilcara.jpg',
     category: 'Hogar',
     stock: 40,
@@ -133,7 +144,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '12',
     title: 'Aspiradora Dyson V15 Detect',
     price: 599990,
-    description: 'Potencia de succión extrema. LCD muestra partículas, láser detecta polvo invisible, hasta 60 minutos.',
+    description:
+      'Potencia de succión extrema. LCD muestra partículas, láser detecta polvo invisible, hasta 60 minutos.',
     image: 'https://http2.mlstatic.com/D_NQ_NP_702014-MLA95712618626_102025-O.webp',
     category: 'Hogar',
     stock: 6,
@@ -144,7 +156,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '13',
     title: 'Camiseta Nike Dri-FIT Academy',
     price: 16990,
-    description: 'Tecnología que absorbe el sudor. Tejido transpirable, corte estándar,100% poliéster. Varios colores.',
+    description:
+      'Tecnología que absorbe el sudor. Tejido transpirable, corte estándar,100% poliéster. Varios colores.',
     image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=400&fit=crop',
     category: 'Moda',
     stock: 100,
@@ -155,7 +168,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '14',
     title: 'Jordan 1 Retro High OG "Chicago"',
     price: 199990,
-    description: 'El icónico colorway. Cuero premium, amortiguación Air, originals盒. 100% authenticity guaranteed.',
+    description:
+      'El icónico colorway. Cuero premium, amortiguación Air, originals盒. 100% authenticity guaranteed.',
     image: 'https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&h=400&fit=crop',
     category: 'Moda',
     stock: 2,
@@ -166,7 +180,8 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '15',
     title: 'Silla Gamer Secretlab Titan Evo 2024',
     price: 329990,
-    description: 'Confort premium para gaming. Respaldo de 4 vías, reposabrazos 4D, piel sintética. Color black.',
+    description:
+      'Confort premium para gaming. Respaldo de 4 vías, reposabrazos 4D, piel sintética. Color black.',
     image: 'https://soytechno.com/wp-content/uploads/2024/11/Secretlab-TITAN-Evo-2024-Final-Fantasy-XIV-Online-M07-E24PU-FFXIV1R.jpg',
     category: 'Hogar',
     stock: 15,
@@ -178,35 +193,12 @@ image: 'https://www.sony.com.bo/image/6145c1d32e6ac8e63a46c912dc33c5bb?fmt=pjpeg
     id: '16',
     title: 'Apple Watch Series 9 GPS 45mm',
     price: 429990,
-    description: 'El smartwatch más avanzado. Chip S9, Double Tap, Siri lebih kilat, pantalla toujours-on más brillante.',
+    description:
+      'El smartwatch más avanzado. Chip S9, Double Tap, Siri lebih kilat, pantalla toujours-on más brillante.',
     image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=600&h=400&fit=crop',
     category: 'Electrónica',
     stock: 20,
     seller: 'Apple Official Store',
     rating: 4.8,
   },
-];
-
-export const searchSuggestions = [
-  'iPhone 15',
-  'Samsung Galaxy',
-  'Nike Air Max',
-  'MacBook Pro',
-  'PlayStation 5',
-  'Kindle',
-  'AirPods Pro',
-  'Jordan 1',
-  'ASUS ROG',
-  'Dyson',
-];
-
-export const categories = [
-  { id: 'electronica', name: 'Electrónica', icon: '📱', count: 8500 },
-  { id: 'hogar', name: 'Muebles', icon: '🏠', count: 4200 },
-  { id: 'moda', name: 'Deporte', icon: '👟', count: 3800 },
-  { id: 'libros', name: 'Libros', icon: '📚', count: 1200 },
-  { id: 'vehiculos', name: 'Vehículos', icon: '🚗', count: 950 },
-  { id: 'deportes', name: 'Deportes', icon: '⚽', count: 2100 },
-  { id: 'juegos', name: 'Juegos y Juguetes', icon: '🎮', count: 1800 },
-  { id: 'belleza', name: 'Belleza', icon: '💄', count: 1600 },
 ];

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
-import { mockProducts, categories } from '../mocks/products';
+import { categories } from '../constants/catalog';
+import { useFeaturedProducts } from '../hooks/useProducts';
 
 export const HomePage = () => {
-  const featuredProducts = mockProducts.slice(0, 8);
+  const { products: featuredProducts = [] } = useFeaturedProducts();
   const [slideIndex, setSlideIndex] = useState(0);
 
 const slides = [

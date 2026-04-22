@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Product } from '../types';
+import { useCartStore } from '../store/useCartStore';
 
 interface ProductCardProps {
   product: Product;
@@ -8,6 +9,8 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, variant = 'default', animationDelay = 0 }: ProductCardProps) => {
+  const addItem = useCartStore((state) => state.addItem);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -180,6 +183,19 @@ export const ProductCard = ({ product, variant = 'default', animationDelay = 0 }
                 ¡Poco stock disponible!
               </div>
             )}
+
+            <button
+              type="button"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                addItem(product);
+              }}
+              disabled={product.stock === 0}
+              className="mt-4 w-full py-2.5 bg-[#001D3D] text-white rounded-lg text-sm font-semibold hover:bg-blue-900 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Agregar
+            </button>
           </div>
         </div>
       </Link>

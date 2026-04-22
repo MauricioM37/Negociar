@@ -1,90 +1,181 @@
-// apps/web/src/services/productService.ts
+import type { Product, ProductCatalogQuery } from '../types';
 
-import { mockProducts } from '../mocks/products';
-import type { Product } from '../types';
+const API_BASE_URL = 'http://localhost:3001/api/products';
+const API_ORIGIN = 'http://localhost:3001';
+const AUTH_STORAGE_KEY = 'my-turbo-auth';
 
-/**
- * SERVICIO: ProductService - Gestiona operaciones con productos
- * 
- * ACTUAL: Usa datos mockeados locales con delay simulado
- * FUTURO: Cada método hará fetch a la API real
- */
+const getAuthToken = (): string | null => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
-// Simulamos latencia de red
-const delay = (ms: number): Promise<void> => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  try {
+    const raw = window.localStorage.getItem(AUTH_STORAGE_KEY);
+
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as { token?: string };
+    return parsed.token ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const normalizeImage = (image: string): string => {
+  if (!image) {
+    return image;
+  }
+
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
+
+  return `${API_ORIGIN}${image.startsWith('/') ? image : `/${image}`}`;
+};
+
+const normalizeProduct = (product: Product): Product => ({
+  ...product,
+  image: normalizeImage(product.image),
+});
+
+const buildQueryString = (query?: ProductCatalogQuery): string => {
+  if (!query) {
+    return '';
+  }
+
+  const params = new URLSearchParams();
+
+  if (query.search) params.set('search', query.search);
+  if (query.category) params.set('category', query.category);
+  if (typeof query.minPrice === 'number') params.set('minPrice', String(query.minPrice));
+  if (typeof query.maxPrice === 'number') params.set('maxPrice', String(query.maxPrice));
+  if (query.sortBy) params.set('sortBy', query.sortBy);
+  if (typeof query.ownerId === 'number') params.set('ownerId', String(query.ownerId));
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}` : '';
+};
+
+const request = async <T>(path = '', query?: ProductCatalogQuery): Promise<T> => {
+  const response = await fetch(`${API_BASE_URL}${path}${buildQueryString(query)}`);
+
+  if (!response.ok) {
+    throw new Error(`Request failed with status ${response.status}`);
+  }
+
+  return (await response.json()) as T;
+};
+
+const requestWithAuth = async <T>(path: string, options: RequestInit): Promise<T> => {
+  const token = getAuthToken();
+
+  if (!token) {
+    throw new Error('Necesitás iniciar sesión para administrar productos');
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(options.headers ?? {}),
+    },
+  });
+
+  if (!response.ok) {
+    const fallback = `Request failed with status ${response.status}`;
+    let message = fallback;
+
+    try {
+      const data = (await response.json()) as { message?: string };
+      if (data.message) {
+        message = data.message;
+      }
+    } catch {
+      // ignore JSON parsing failures and keep fallback message
+    }
+
+    throw new Error(message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return (await response.json()) as T;
 };
 
 export const productService = {
-  /**
-   * Obtener todos los productos
-   * ACTUAL: Mock con delay
-   * FUTURO: GET /api/products
-   */
-  getAll: async (): Promise<Product[]> => {
-    console.log('[MOCK] productService.getAll() - Usando datos mock');
-    await delay(500);
-    return [...mockProducts];
+  getAll: async (query?: ProductCatalogQuery): Promise<Product[]> => {
+    const products = await request<Product[]>('', query);
+    return products.map(normalizeProduct);
   },
 
-  /**
-   * Obtener un producto por su ID
-   * ACTUAL: Mock con búsqueda local
-   * FUTURO: GET /api/products/:id
-   */
   getById: async (id: string): Promise<Product | undefined> => {
-    console.log(`[MOCK] productService.getById(${id}) - Buscando en mock`);
-    await delay(300);
-    return mockProducts.find(p => p.id === id);
+    try {
+      const product = await request<Product>(`/${id}`);
+      return normalizeProduct(product);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return undefined;
+      }
+
+      throw error;
+    }
   },
 
-  /**
-   * Obtener productos destacados (para Home)
-   * ACTUAL: Primeros 4 productos
-   * FUTURO: GET /api/products/featured
-   */
   getFeatured: async (): Promise<Product[]> => {
-    console.log('[MOCK] productService.getFeatured() - Usando primeros 4 productos');
-    await delay(400);
-    return mockProducts.slice(0, 4);
+    const products = await request<Product[]>('/featured');
+    return products.map(normalizeProduct);
   },
 
-  /**
-   * Obtener productos por categoría
-   * ACTUAL: Filtro local
-   * FUTURO: GET /api/products?category=:category
-   */
   getByCategory: async (category: string): Promise<Product[]> => {
-    console.log(`[MOCK] productService.getByCategory(${category}) - Filtrando localmente`);
-    await delay(400);
-    
     if (category === 'all' || category === 'todas') {
-      return [...mockProducts];
+      const products = await request<Product[]>('');
+      return products.map(normalizeProduct);
     }
-    
-    return mockProducts.filter(
-      product => product.category.toLowerCase() === category.toLowerCase()
-    );
+
+    const products = await request<Product[]>('', { category });
+    return products.map(normalizeProduct);
   },
 
-  /**
-   * Búsqueda simple por texto
-   * ACTUAL: Búsqueda local
-   * FUTURO: GET /api/products/search?q=:query
-   */
   search: async (query: string): Promise<Product[]> => {
-    console.log(`[MOCK] productService.search("${query}") - Búsqueda local`);
-    await delay(600);
-    
     if (!query || query.trim() === '') {
-      return [...mockProducts];
+      const products = await request<Product[]>('');
+      return products.map(normalizeProduct);
     }
-    
-    const lowerQuery = query.toLowerCase().trim();
-    return mockProducts.filter(product =>
-      product.title.toLowerCase().includes(lowerQuery) ||
-      product.description.toLowerCase().includes(lowerQuery) ||
-      product.category.toLowerCase().includes(lowerQuery)
-    );
+
+    const products = await request<Product[]>('', { search: query.trim() });
+    return products.map(normalizeProduct);
+  },
+
+  getMine: async (ownerId: number): Promise<Product[]> => {
+    const products = await request<Product[]>('', { ownerId, sortBy: 'relevance' });
+    return products.map(normalizeProduct);
+  },
+
+  createProduct: async (payload: FormData): Promise<Product> => {
+    const product = await requestWithAuth<Product>('', {
+      method: 'POST',
+      body: payload,
+    });
+
+    return normalizeProduct(product);
+  },
+
+  updateProduct: async (id: string, payload: FormData): Promise<Product> => {
+    const product = await requestWithAuth<Product>(`/${id}`, {
+      method: 'PUT',
+      body: payload,
+    });
+
+    return normalizeProduct(product);
+  },
+
+  deleteProduct: async (id: string): Promise<void> => {
+    await requestWithAuth<void>(`/${id}`, {
+      method: 'DELETE',
+    });
   },
 };

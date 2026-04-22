@@ -3,13 +3,120 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
+model Role {
+  id   Int    @id @default(autoincrement()) @map("role_id")
+  name String @map("role_name") @db.VarChar(30)
+
+  users User[]
+
+  @@map("role")
+}
+
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  createdAt DateTime @default(now())
+  id           Int      @id @default(autoincrement()) @map("user_id")
+  username     String   @db.VarChar(150)
+  email        String?  @db.VarChar(100)
+  passwordHash String?  @map("passwordhash") @db.VarChar(255)
+  fullName     String   @map("full_name") @db.VarChar(250)
+  roleId       Int?     @map("role_id")
+  phone        String?  @db.VarChar(20)
+  address      String?  @db.VarChar(50)
+  activeState  Boolean? @default(true) @map("active_state")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  role  Role?  @relation(fields: [roleId], references: [id])
+  sales Sale[]
+
+  @@map("user")
+}
+
+enum DeliveryState {
+  PENDIENTE  @map("pendiente")
+  CONFIRMADO @map("confirmado")
+  EN_PROCESO @map("en proceso")
+  EN_CAMINO  @map("en camino")
+  FINALIZADO @map("finalizado")
+  CANCELADO  @map("cancelado")
+
+  @@map("delivery_state")
+}
+
+model Sale {
+  id            Int            @id @default(autoincrement()) @map("sale_id")
+  userId        Int            @map("user_id")
+  address       String?        @db.VarChar(150)
+  deliveryState DeliveryState? @map("delivery_state")
+  totalPrice    Decimal        @map("total_price") @db.Decimal(10, 2)
+  canceledAt    DateTime?      @map("canceled_at")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items SaleItem[]
+
+  @@map("sale")
+}
+
+model Category {
+  id   Int    @id @default(autoincrement()) @map("category_id")
+  name String @map("category_name") @db.VarChar(150)
+
+  products Product[]
+
+  @@map("category")
+}
+
+model Supplier {
+  id          Int      @id @default(autoincrement()) @map("supplier_id")
+  name        String   @map("supplier_name") @db.VarChar(150)
+  cuil        String?  @db.VarChar(50)
+  email       String?  @db.VarChar(50)
+  phoneNumber String?  @map("phone_number") @db.VarChar(50)
+  activeState Boolean  @default(true) @map("active_state")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@map("supplier")
+}
+
+model Product {
+  id          Int      @id @default(autoincrement()) @map("product_id")
+  name        String   @map("product_name") @db.VarChar(255)
+  description String?  @map("product_description") @db.Text
+  imagePath   String?  @map("image_path") @db.VarChar(500)
+  price       Decimal  @db.Decimal(10, 2)
+  categoryId  Int      @map("category_id")
+  supplierId  Int?     @map("supplier_id")
+  activeState Boolean  @default(true) @map("active_state")
+  stock       Int
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  category  Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  supplier  Supplier?  @relation(fields: [supplierId], references: [id])
+  saleItems SaleItem[]
+
+  @@map("product")
+}
+
+model SaleItem {
+  id        Int      @id @default(autoincrement()) @map("sale_item_id")
+  saleId    Int      @map("sale_id")
+  productId Int      @map("product_id")
+  amount    Int      @default(1)
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("sale_item")
 }

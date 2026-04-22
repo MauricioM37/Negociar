@@ -4,10 +4,3 @@ dist/
 build/
 coverage/
 .env
-
-node_modules/
-.env
-dist/
-build/
-.turbo/
-coverage/

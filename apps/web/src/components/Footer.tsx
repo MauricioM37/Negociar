@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
  * COMPONENTE: Footer
  * 
  * ACTUAL: Footer informativo simple
- * FUTURO:
  *         - Links a redes sociales
  *         - Newsletter subscription
  *         - Métodos de pago

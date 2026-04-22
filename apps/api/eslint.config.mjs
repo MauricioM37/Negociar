@@ -1,3 +1,3 @@
-import baseConfig from '@my-turbo/config/eslint/base';
+import baseConfig from '@Negociar/config/eslint/base';
 
 export default [...baseConfig];
