@@ -5,7 +5,7 @@ import type {
   ProductQueryFilters,
   ProductUpdateInput,
 } from '../types/product';
-import { searchProductsWithAI } from './ai.service';
+import { buscarProductosIA } from './ai.service';
 
 const categoryMap: Record<string, string> = {
   electronica: 'electrónica',
@@ -18,17 +18,19 @@ const categoryMap: Record<string, string> = {
   belleza: 'belleza',
 };
 
+interface ProductRecord {
+  id: number;
+  name: string;
+  description: string | null;
+  imagePath: string | null;
+  price: { toNumber: () => number } | number;
+  stock: number;
+  category: { name: string };
+  supplier: { id: number; name: string } | null;
+}
+
 export class ProductService {
-  private mapProduct(product: {
-    id: number;
-    name: string;
-    description: string | null;
-    imagePath: string | null;
-    price: { toNumber: () => number } | number;
-    stock: number;
-    category: { name: string };
-    supplier: { id: number; name: string } | null;
-  }): Product {
+  private mapProduct(product: ProductRecord): Product {
     const priceValue =
       typeof product.price === 'number' ? product.price : Number(product.price.toNumber());
 
@@ -100,35 +102,35 @@ export class ProductService {
     return created.id;
   }
 
-  async getProducts(filters: ProductQueryFilters): Promise<Product[]> {
+  async buscarProductos(filtros: ProductQueryFilters): Promise<Product[]> {
     const {
-      search,
-      category,
-      minPrice = 0,
-      maxPrice = Number.MAX_SAFE_INTEGER,
-      sortBy = 'relevance',
-      ownerId,
-    } = filters;
+      search: busqueda,
+      category: categoria,
+      minPrice: precioMinimo = 0,
+      maxPrice: precioMaximo = Number.MAX_SAFE_INTEGER,
+      sortBy: orden = 'relevance',
+      ownerId: idPropietario,
+    } = filtros;
 
-    let supplierIdFilter: number | undefined;
+    let filtroIdProveedor: number | undefined;
 
-    if (typeof ownerId === 'number') {
-      const ownerSupplierId = await this.findSupplierForOwner(ownerId);
-      if (!ownerSupplierId) {
+    if (typeof idPropietario === 'number') {
+      const idProveedorPropietario = await this.findSupplierForOwner(idPropietario);
+      if (!idProveedorPropietario) {
         return [];
       }
 
-      supplierIdFilter = ownerSupplierId;
+      filtroIdProveedor = idProveedorPropietario;
     }
 
-    const productsFromDb = await prisma.product.findMany({
+    const productosDesdeDb = await prisma.product.findMany({
       where: {
         activeState: true,
         price: {
-          gte: minPrice,
-          lte: maxPrice,
+          gte: precioMinimo,
+          lte: precioMaximo,
         },
-        ...(supplierIdFilter ? { supplierId: supplierIdFilter } : {}),
+        ...(filtroIdProveedor ? { supplierId: filtroIdProveedor } : {}),
       },
       include: {
         category: true,
@@ -136,62 +138,64 @@ export class ProductService {
       },
     });
 
-    let products = productsFromDb.map((product) => this.mapProduct(product));
+    let productos: Product[] = productosDesdeDb.map((producto: ProductRecord) =>
+      this.mapProduct(producto),
+    );
 
-    if (search && search.trim() !== '') {
+    if (busqueda && busqueda.trim() !== '') {
       try {
-        products = await searchProductsWithAI(search, products);
+        productos = await buscarProductosIA(busqueda, productos);
       } catch (error) {
-        const term = search.toLowerCase().trim();
-        products = products.filter((product) =>
-          product.title.toLowerCase().includes(term) ||
-          product.description.toLowerCase().includes(term) ||
-          product.category.toLowerCase().includes(term) ||
-          product.seller.toLowerCase().includes(term),
+        const termino = busqueda.toLowerCase().trim();
+        productos = productos.filter((producto) =>
+          producto.title.toLowerCase().includes(termino) ||
+          producto.description.toLowerCase().includes(termino) ||
+          producto.category.toLowerCase().includes(termino) ||
+          producto.seller.toLowerCase().includes(termino),
         );
 
         console.error('AI search failed, using fallback search:', error);
       }
     }
 
-    if (category && category.trim() !== '') {
-      const normalizedCategory = categoryMap[category] ?? category.toLowerCase();
-      products = products.filter((product) =>
-        product.category.toLowerCase().includes(normalizedCategory),
+    if (categoria && categoria.trim() !== '') {
+      const categoriaNormalizada = categoryMap[categoria] ?? categoria.toLowerCase();
+      productos = productos.filter((producto) =>
+        producto.category.toLowerCase().includes(categoriaNormalizada),
       );
     }
 
-    products = products.filter(
-      (product) => product.price >= minPrice && product.price <= maxPrice,
+    productos = productos.filter(
+      (producto) => producto.price >= precioMinimo && producto.price <= precioMaximo,
     );
 
-    switch (sortBy) {
+    switch (orden) {
       case 'price_asc':
-        products.sort((a, b) => a.price - b.price);
+        productos.sort((a, b) => a.price - b.price);
         break;
       case 'price_desc':
-        products.sort((a, b) => b.price - a.price);
+        productos.sort((a, b) => b.price - a.price);
         break;
       case 'rating':
-        products.sort((a, b) => b.rating - a.rating);
+        productos.sort((a, b) => b.rating - a.rating);
         break;
       default:
         break;
     }
 
-    return products;
+    return productos;
   }
 
-  async getById(id: string): Promise<Product | undefined> {
-    const productId = Number(id);
+  async obtenerPorId(id: string): Promise<Product | undefined> {
+    const idProducto = Number(id);
 
-    if (!Number.isFinite(productId)) {
+    if (!Number.isFinite(idProducto)) {
       return undefined;
     }
 
-    const product = await prisma.product.findFirst({
+    const producto = await prisma.product.findFirst({
       where: {
-        id: productId,
+        id: idProducto,
         activeState: true,
       },
       include: {
@@ -200,42 +204,42 @@ export class ProductService {
       },
     });
 
-    if (!product) {
+    if (!producto) {
       return undefined;
     }
 
-    return this.mapProduct(product);
+    return this.mapProduct(producto);
   }
 
-  async getFeatured(limit = 8): Promise<Product[]> {
-    const products = await prisma.product.findMany({
+  async obtenerDestacados(limite = 8): Promise<Product[]> {
+    const productos = await prisma.product.findMany({
       where: { activeState: true },
       include: {
         category: true,
         supplier: true,
       },
       orderBy: { createdAt: 'desc' },
-      take: limit,
+      take: limite,
     });
 
-    return products.map((product) => this.mapProduct(product));
+    return productos.map((producto: ProductRecord) => this.mapProduct(producto));
   }
 
-  async create(input: ProductMutationInput): Promise<Product> {
-    const [categoryId, supplierId] = await Promise.all([
-      this.ensureCategory(input.category),
-      this.ensureSupplierForOwner(input.ownerId),
+  async registrarProducto(entrada: ProductMutationInput): Promise<Product> {
+    const [idCategoria, idProveedor] = await Promise.all([
+      this.ensureCategory(entrada.category),
+      this.ensureSupplierForOwner(entrada.ownerId),
     ]);
 
-    const created = await prisma.product.create({
+    const creado = await prisma.product.create({
       data: {
-        name: input.title.trim(),
-        description: input.description.trim(),
-        price: input.price,
-        stock: input.stock,
-        imagePath: input.image,
-        categoryId,
-        supplierId,
+        name: entrada.title.trim(),
+        description: entrada.description.trim(),
+        price: entrada.price,
+        stock: entrada.stock,
+        imagePath: entrada.image,
+        categoryId: idCategoria,
+        supplierId: idProveedor,
         activeState: true,
       },
       include: {
@@ -244,45 +248,45 @@ export class ProductService {
       },
     });
 
-    return this.mapProduct(created);
+    return this.mapProduct(creado);
   }
 
-  async update(id: string, input: ProductUpdateInput): Promise<Product | undefined> {
-    const productId = Number(id);
+  async actualizarProducto(id: string, entrada: ProductUpdateInput): Promise<Product | undefined> {
+    const idProducto = Number(id);
 
-    if (!Number.isFinite(productId)) {
+    if (!Number.isFinite(idProducto)) {
       return undefined;
     }
 
-    const ownerSupplierId = await this.findSupplierForOwner(input.ownerId);
+    const idProveedorPropietario = await this.findSupplierForOwner(entrada.ownerId);
 
-    if (!ownerSupplierId) {
+    if (!idProveedorPropietario) {
       return undefined;
     }
 
-    const existing = await prisma.product.findFirst({
+    const existente = await prisma.product.findFirst({
       where: {
-        id: productId,
+        id: idProducto,
         activeState: true,
-        supplierId: ownerSupplierId,
+        supplierId: idProveedorPropietario,
       },
     });
 
-    if (!existing) {
+    if (!existente) {
       return undefined;
     }
 
-    const categoryId = input.category ? await this.ensureCategory(input.category) : undefined;
+    const idCategoria = entrada.category ? await this.ensureCategory(entrada.category) : undefined;
 
-    const updated = await prisma.product.update({
-      where: { id: productId },
+    const actualizado = await prisma.product.update({
+      where: { id: idProducto },
       data: {
-        ...(input.title !== undefined ? { name: input.title.trim() } : {}),
-        ...(input.description !== undefined ? { description: input.description.trim() } : {}),
-        ...(input.price !== undefined ? { price: input.price } : {}),
-        ...(input.stock !== undefined ? { stock: input.stock } : {}),
-        ...(input.image !== undefined ? { imagePath: input.image } : {}),
-        ...(categoryId ? { categoryId } : {}),
+        ...(entrada.title !== undefined ? { name: entrada.title.trim() } : {}),
+        ...(entrada.description !== undefined ? { description: entrada.description.trim() } : {}),
+        ...(entrada.price !== undefined ? { price: entrada.price } : {}),
+        ...(entrada.stock !== undefined ? { stock: entrada.stock } : {}),
+        ...(entrada.image !== undefined ? { imagePath: entrada.image } : {}),
+        ...(idCategoria ? { categoryId: idCategoria } : {}),
       },
       include: {
         category: true,
@@ -290,36 +294,36 @@ export class ProductService {
       },
     });
 
-    return this.mapProduct(updated);
+    return this.mapProduct(actualizado);
   }
 
-  async delete(id: string, ownerId: number): Promise<boolean> {
-    const productId = Number(id);
+  async eliminarProducto(id: string, idPropietario: number): Promise<boolean> {
+    const idProducto = Number(id);
 
-    if (!Number.isFinite(productId)) {
+    if (!Number.isFinite(idProducto)) {
       return false;
     }
 
-    const ownerSupplierId = await this.findSupplierForOwner(ownerId);
+    const idProveedorPropietario = await this.findSupplierForOwner(idPropietario);
 
-    if (!ownerSupplierId) {
+    if (!idProveedorPropietario) {
       return false;
     }
 
-    const existing = await prisma.product.findFirst({
+    const existente = await prisma.product.findFirst({
       where: {
-        id: productId,
+        id: idProducto,
         activeState: true,
-        supplierId: ownerSupplierId,
+        supplierId: idProveedorPropietario,
       },
       select: { id: true },
     });
 
-    if (!existing) {
+    if (!existente) {
       return false;
     }
 
-    await prisma.product.delete({ where: { id: productId } });
+    await prisma.product.delete({ where: { id: idProducto } });
     return true;
   }
 }

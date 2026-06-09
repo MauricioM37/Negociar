@@ -28,7 +28,7 @@ export const useFeaturedProducts = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await productService.getFeatured();
+      const data = await productService.obtenerDestacados();
       setProducts(data);
     } catch (err) {
       setError('Error al cargar productos destacados');
@@ -59,7 +59,7 @@ export const useProductsByCategory = (category: string) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await productService.getByCategory(category);
+      const data = await productService.obtenerPorCategoria(category);
       setProducts(data);
     } catch (err) {
       setError('Error al cargar productos');
@@ -96,7 +96,7 @@ export const useSearchProducts = (searchQuery: string) => {
       try {
         setLoading(true);
         setError(null);
-        const data = await productService.search(searchQuery);
+        const data = await productService.buscar(searchQuery);
         if (isMounted) {
           setProducts(data);
         }
@@ -133,7 +133,7 @@ export const useCatalogProducts = (query: ProductCatalogQuery) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await productService.getAll(query);
+      const data = await productService.obtenerTodos(query);
       setProducts(data);
     } catch (err) {
       setError('Error al cargar productos del catálogo');

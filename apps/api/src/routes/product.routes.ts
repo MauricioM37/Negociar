@@ -4,22 +4,22 @@ import { requireRole, verifyToken } from '../middlewares/auth.middleware';
 import { productImageUpload } from '../config/multer';
 
 export const productRouter: ExpressRouter = Router();
-
-productRouter.get('/', productController.getProducts);
-productRouter.get('/featured', productController.getFeaturedProducts);
-productRouter.get('/:id', productController.getProductById);
+//traer productos
+productRouter.get('/', productController.buscarProductos);
+productRouter.get('/featured', productController.obtenerProductosDestacados);
+productRouter.get('/:id', productController.obtenerProductoPorId);
 productRouter.post(
   '/',
   verifyToken,
   requireRole('seller'),
   productImageUpload.single('image'),
-  productController.createProduct,
+  productController.registrarProducto,
 );
 productRouter.put(
   '/:id',
   verifyToken,
   requireRole('seller'),
   productImageUpload.single('image'),
-  productController.updateProduct,
+  productController.actualizarProducto,
 );
-productRouter.delete('/:id', verifyToken, requireRole('seller'), productController.deleteProduct);
+productRouter.delete('/:id', verifyToken, requireRole('seller'), productController.eliminarProducto);
