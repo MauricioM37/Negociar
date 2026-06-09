@@ -107,15 +107,15 @@ const requestWithAuth = async <T>(path: string, options: RequestInit): Promise<T
 };
 
 export const productService = {
-  getAll: async (query?: ProductCatalogQuery): Promise<Product[]> => {
-    const products = await request<Product[]>('', query);
-    return products.map(normalizeProduct);
+  obtenerTodos: async (consulta?: ProductCatalogQuery): Promise<Product[]> => {
+    const productos = await request<Product[]>('', consulta);
+    return productos.map(normalizeProduct);
   },
 
-  getById: async (id: string): Promise<Product | undefined> => {
+  obtenerPorId: async (id: string): Promise<Product | undefined> => {
     try {
-      const product = await request<Product>(`/${id}`);
-      return normalizeProduct(product);
+      const producto = await request<Product>(`/${id}`);
+      return normalizeProduct(producto);
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
         return undefined;
@@ -125,55 +125,55 @@ export const productService = {
     }
   },
 
-  getFeatured: async (): Promise<Product[]> => {
-    const products = await request<Product[]>('/featured');
-    return products.map(normalizeProduct);
+  obtenerDestacados: async (): Promise<Product[]> => {
+    const productos = await request<Product[]>('/featured');
+    return productos.map(normalizeProduct);
   },
 
-  getByCategory: async (category: string): Promise<Product[]> => {
-    if (category === 'all' || category === 'todas') {
-      const products = await request<Product[]>('');
-      return products.map(normalizeProduct);
+  obtenerPorCategoria: async (categoria: string): Promise<Product[]> => {
+    if (categoria === 'all' || categoria === 'todas') {
+      const productos = await request<Product[]>('');
+      return productos.map(normalizeProduct);
     }
 
-    const products = await request<Product[]>('', { category });
-    return products.map(normalizeProduct);
+    const productos = await request<Product[]>('', { category: categoria });
+    return productos.map(normalizeProduct);
   },
 
-  search: async (query: string): Promise<Product[]> => {
-    if (!query || query.trim() === '') {
-      const products = await request<Product[]>('');
-      return products.map(normalizeProduct);
+  buscar: async (consulta: string): Promise<Product[]> => {
+    if (!consulta || consulta.trim() === '') {
+      const productos = await request<Product[]>('');
+      return productos.map(normalizeProduct);
     }
 
-    const products = await request<Product[]>('', { search: query.trim() });
-    return products.map(normalizeProduct);
+    const productos = await request<Product[]>('', { search: consulta.trim() });
+    return productos.map(normalizeProduct);
   },
 
-  getMine: async (ownerId: number): Promise<Product[]> => {
-    const products = await request<Product[]>('', { ownerId, sortBy: 'relevance' });
-    return products.map(normalizeProduct);
+  obtenerMisProductos: async (idPropietario: number): Promise<Product[]> => {
+    const productos = await request<Product[]>('', { ownerId: idPropietario, sortBy: 'relevance' });
+    return productos.map(normalizeProduct);
   },
 
-  createProduct: async (payload: FormData): Promise<Product> => {
-    const product = await requestWithAuth<Product>('', {
+  registrarProducto: async (entrada: FormData): Promise<Product> => {
+    const producto = await requestWithAuth<Product>('', {
       method: 'POST',
-      body: payload,
+      body: entrada,
     });
 
-    return normalizeProduct(product);
+    return normalizeProduct(producto);
   },
 
-  updateProduct: async (id: string, payload: FormData): Promise<Product> => {
-    const product = await requestWithAuth<Product>(`/${id}`, {
+  actualizarProducto: async (id: string, entrada: FormData): Promise<Product> => {
+    const producto = await requestWithAuth<Product>(`/${id}`, {
       method: 'PUT',
-      body: payload,
+      body: entrada,
     });
 
-    return normalizeProduct(product);
+    return normalizeProduct(producto);
   },
 
-  deleteProduct: async (id: string): Promise<void> => {
+  eliminarProducto: async (id: string): Promise<void> => {
     await requestWithAuth<void>(`/${id}`, {
       method: 'DELETE',
     });

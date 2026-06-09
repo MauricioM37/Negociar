@@ -20,7 +20,7 @@ export class ProductController {
     return Number.isFinite(parsed) ? parsed : undefined;
   }
 
-  getProducts = async (req: Request, res: Response): Promise<void> => {
+  buscarProductos = async (req: Request, res: Response): Promise<void> => {
     const sortParam = typeof req.query.sortBy === 'string' ? req.query.sortBy : undefined;
     const sortBy = sortParam && isSortOption(sortParam) ? sortParam : 'relevance';
 
@@ -33,11 +33,11 @@ export class ProductController {
       ownerId: typeof req.query.ownerId === 'string' ? this.parseNumberParam(req.query.ownerId) : undefined,
     };
 
-    const products = await productService.getProducts(filters);
+    const products = await productService.buscarProductos(filters);
     res.json(products);
   };
 
-  getProductById = async (req: Request, res: Response): Promise<void> => {
+  obtenerProductoPorId = async (req: Request, res: Response): Promise<void> => {
     const idParam = req.params.id;
     const id = Array.isArray(idParam) ? idParam[0] : idParam;
 
@@ -46,7 +46,7 @@ export class ProductController {
       return;
     }
 
-    const product = await productService.getById(id);
+    const product = await productService.obtenerPorId(id);
 
     if (!product) {
       res.status(404).json({ message: 'Product not found' });
@@ -56,12 +56,12 @@ export class ProductController {
     res.json(product);
   };
 
-  getFeaturedProducts = async (_req: Request, res: Response): Promise<void> => {
-    const products = await productService.getFeatured();
+  obtenerProductosDestacados = async (_req: Request, res: Response): Promise<void> => {
+    const products = await productService.obtenerDestacados();
     res.json(products);
   };
 
-  createProduct = async (req: Request, res: Response): Promise<void> => {
+  registrarProducto = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
 
     if (!userId) {
@@ -81,7 +81,7 @@ export class ProductController {
       return;
     }
 
-    const created = await productService.create({
+    const created = await productService.registrarProducto({
       title,
       description,
       category,
@@ -94,7 +94,7 @@ export class ProductController {
     res.status(201).json(created);
   };
 
-  updateProduct = async (req: Request, res: Response): Promise<void> => {
+  actualizarProducto = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
 
     if (!userId) {
@@ -122,7 +122,7 @@ export class ProductController {
       return;
     }
 
-    const updated = await productService.update(id, {
+    const updated = await productService.actualizarProducto(id, {
       title,
       description,
       category,
@@ -140,7 +140,7 @@ export class ProductController {
     res.json(updated);
   };
 
-  deleteProduct = async (req: Request, res: Response): Promise<void> => {
+  eliminarProducto = async (req: Request, res: Response): Promise<void> => {
     const userId = req.user?.id;
 
     if (!userId) {
@@ -156,7 +156,7 @@ export class ProductController {
       return;
     }
 
-    const deleted = await productService.delete(id, userId);
+    const deleted = await productService.eliminarProducto(id, userId);
 
     if (!deleted) {
       res.status(404).json({ message: 'Product not found' });

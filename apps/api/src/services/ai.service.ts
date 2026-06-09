@@ -59,13 +59,13 @@ const parseProductIds = (rawContent: string): string[] => {
     .filter((value) => value.length > 0);
 };
 
-const buildMessages = (query: string, availableProducts: Product[]): GroqChatMessage[] => {
-  const simplifiedProducts = availableProducts.map((product) => ({
-    id: product.id,
-    name: product.title,
-    description: product.description,
-    category: product.category,
-    price: product.price,
+const buildMessages = (consulta: string, productosDisponibles: Product[]): GroqChatMessage[] => {
+  const productosSimplificados = productosDisponibles.map((producto) => ({
+    id: producto.id,
+    name: producto.title,
+    description: producto.description,
+    category: producto.category,
+    price: producto.price,
   }));
 
   return [
@@ -77,23 +77,23 @@ const buildMessages = (query: string, availableProducts: Product[]): GroqChatMes
         'Debes devolver SOLO un JSON array de product_id ordenados por relevancia.',
         'No agregues texto, explicación ni markdown.',
         'Si no hay coincidencias, devuelve [].',
-        `Productos disponibles (JSON): ${JSON.stringify(simplifiedProducts)}`,
+        `Productos disponibles (JSON): ${JSON.stringify(productosSimplificados)}`,
       ].join(' '),
     },
     {
       role: 'user',
-      content: `Consulta del usuario: "${query}". Responde únicamente con un JSON array de product_id.`,
+      content: `Consulta del usuario: "${consulta}". Responde únicamente con un JSON array de product_id.`,
     },
   ];
 };
 
-export const searchProductsWithAI = async (
-  query: string,
-  availableProducts: Product[],
+export const buscarProductosIA = async (
+  consulta: string,
+  productosDisponibles: Product[],
 ): Promise<Product[]> => {
   const apiKey = process.env.GROQ_API_KEY;
 
-  if (!apiKey || query.trim() === '') {
+  if (!apiKey || consulta.trim() === '') {
     throw new Error('Groq API key no configurada o búsqueda vacía');
   }
 
@@ -106,7 +106,7 @@ export const searchProductsWithAI = async (
     body: JSON.stringify({
       model: getGroqModel(),
       temperature: 0,
-      messages: buildMessages(query, availableProducts),
+      messages: buildMessages(consulta, productosDisponibles),
     }),
   });
 
@@ -122,12 +122,12 @@ export const searchProductsWithAI = async (
     throw new Error('Groq devolvió una respuesta vacía');
   }
 
-  const productIds = parseProductIds(rawContent);
-  const productsById = new Map(availableProducts.map((product) => [product.id, product]));
+  const idsProducto = parseProductIds(rawContent);
+  const productosPorId = new Map(productosDisponibles.map((producto) => [producto.id, producto]));
 
-  const deduplicatedIds = [...new Set(productIds)];
+  const idsSinDuplicados = [...new Set(idsProducto)];
 
-  return deduplicatedIds
-    .map((id) => productsById.get(id))
-    .filter((product): product is Product => Boolean(product));
+  return idsSinDuplicados
+    .map((id) => productosPorId.get(id))
+    .filter((producto): producto is Product => Boolean(producto));
 };

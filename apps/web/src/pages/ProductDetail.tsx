@@ -61,7 +61,7 @@ export const ProductDetailPage = () => {
       setError(null);
 
       try {
-        const data = await productService.getById(id);
+        const data = await productService.obtenerPorId(id);
 
         if (cancelled) {
           return;

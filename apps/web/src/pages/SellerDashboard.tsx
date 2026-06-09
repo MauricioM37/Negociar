@@ -41,7 +41,7 @@ export const SellerDashboard = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await productService.getMine(user.id);
+      const data = await productService.obtenerMisProductos(user.id);
       setProducts(data);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : 'No pudimos cargar tus productos');
@@ -98,7 +98,7 @@ export const SellerDashboard = () => {
           formData.set('image', form.image);
         }
 
-        await productService.createProduct(formData);
+        await productService.registrarProducto(formData);
       } else {
         const payload = new FormData();
         payload.set('title', form.title);
@@ -111,7 +111,7 @@ export const SellerDashboard = () => {
           payload.set('image', form.image);
         }
 
-        await productService.updateProduct(editingProductId, payload);
+        await productService.actualizarProducto(editingProductId, payload);
       }
 
       await loadSellerProducts();
@@ -131,7 +131,7 @@ export const SellerDashboard = () => {
 
     try {
       setError(null);
-      await productService.deleteProduct(id);
+      await productService.eliminarProducto(id);
       await loadSellerProducts();
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : 'No pudimos eliminar el producto');
