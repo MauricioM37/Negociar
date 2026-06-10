@@ -323,11 +323,7 @@ export class ProductService {
       return false;
     }
 
-    await prisma.product.update({
-      where: { id: idProducto },
-      data: { activeState: false },
-    });
-
+    await prisma.product.delete({ where: { id: idProducto } });
     return true;
   }
 }
