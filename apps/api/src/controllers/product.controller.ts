@@ -69,17 +69,8 @@ export class ProductController {
       return;
     }
 
-    const title = typeof req.body?.title === 'string' ? req.body.title : '';
-    const description = typeof req.body?.description === 'string' ? req.body.description : '';
-    const category = typeof req.body?.category === 'string' ? req.body.category : '';
-    const price = this.parseNumberParam(req.body?.price);
-    const stock = this.parseNumberParam(req.body?.stock);
+    const { title, description, category, price, stock } = req.body;
     const imagePath = req.file ? `/uploads/products/${req.file.filename}` : undefined;
-
-    if (!title || !description || !category || price === undefined || stock === undefined) {
-      res.status(400).json({ message: 'Title, description, category, price and stock are required' });
-      return;
-    }
 
     const created = await productService.registrarProducto({
       title,
@@ -110,11 +101,7 @@ export class ProductController {
       return;
     }
 
-    const title = typeof req.body?.title === 'string' ? req.body.title : undefined;
-    const description = typeof req.body?.description === 'string' ? req.body.description : undefined;
-    const category = typeof req.body?.category === 'string' ? req.body.category : undefined;
-    const price = this.parseNumberParam(req.body?.price);
-    const stock = this.parseNumberParam(req.body?.stock);
+    const { title, description, category, price, stock } = req.body;
     const imagePath = req.file ? `/uploads/products/${req.file.filename}` : undefined;
 
     if (!title && !description && !category && price === undefined && stock === undefined && !imagePath) {
