@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { searchSuggestions } from '../constants/catalog';
 
 interface SearchBarProps {
@@ -9,11 +9,11 @@ interface SearchBarProps {
   autoFocus?: boolean;
 }
 
-export const SearchBar = ({ 
-  onSearch, 
-  placeholder = "Buscar productos, marcas y más...", 
+export const SearchBar = ({
+  onSearch,
+  placeholder = 'ingresar busqueda',
   initialValue = '',
-  autoFocus = false 
+  autoFocus = false,
 }: SearchBarProps) => {
   const [query, setQuery] = useState(initialValue);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -27,9 +27,9 @@ export const SearchBar = ({
 
   useEffect(() => {
     if (query.length > 0) {
-      const filtered = searchSuggestions.filter(s => 
-        s.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 5);
+      const filtered = searchSuggestions
+        .filter((s) => s.toLowerCase().includes(query.toLowerCase()))
+        .slice(0, 5);
       setFilteredSuggestions(filtered);
       setShowSuggestions(true);
     } else {
@@ -56,12 +56,12 @@ export const SearchBar = ({
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(prev => 
+      setSelectedIndex((prev) =>
         prev < filteredSuggestions.length - 1 ? prev + 1 : prev
       );
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && filteredSuggestions[selectedIndex]) {
@@ -100,8 +100,18 @@ export const SearchBar = ({
             className={`absolute right-14 text-gray-400 hover:text-gray-600 transition-colors
                        ${query.length > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
           <button
@@ -110,20 +120,32 @@ export const SearchBar = ({
                        hover:bg-primary-700 transition-colors
                        focus:outline-none focus:ring-2 focus:ring-ml-blue focus:ring-offset-1"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </button>
         </div>
       </form>
 
       {/* Suggestions dropdown */}
-      <div 
+      <div
         className={`absolute z-50 w-full mt-1 bg-white rounded-lg shadow-dropdown 
                     overflow-hidden transition-all duration-200
-                    ${showSuggestions && filteredSuggestions.length > 0 
-                      ? 'opacity-100 translate-y-0' 
-                      : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                    ${
+                      showSuggestions && filteredSuggestions.length > 0
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 -translate-y-2 pointer-events-none'
+                    }`}
       >
         {filteredSuggestions.map((suggestion, index) => (
           <button
@@ -132,8 +154,18 @@ export const SearchBar = ({
             className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-colors
                        ${index === selectedIndex ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
           >
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              className="w-4 h-4 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
             <span className="text-gray-700">{suggestion}</span>
           </button>
