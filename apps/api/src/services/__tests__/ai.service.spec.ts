@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { Product } from '../../types/product';
-import { buscarProductosIA } from '../ai.service';
+import { buscarProductosIA, GroqAdapter } from '../ai.service';
 
 const products: Product[] = [
   {
@@ -27,7 +27,7 @@ const products: Product[] = [
   },
 ];
 
-describe('buscarProductosIA', () => {
+describe('GroqAdapter', () => {
   it('CP-001-04 orders products from a mocked Groq response without real network calls', async () => {
     process.env.GROQ_API_KEY = 'test-api-key';
     const fetchMock = global.fetch as ReturnType<typeof vi.fn>;
@@ -35,11 +35,11 @@ describe('buscarProductosIA', () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({
-        choices: [{ message: { content: '["2", "1"]' } }],
+        choices: [{ message: { content: '["2", "2", "999", "1"]' } }],
       }),
     });
 
-    const result = await buscarProductosIA('mouse para notebook', products);
+    const result = await new GroqAdapter().buscarProductos('mouse para notebook', products);
 
     expect(result.map((product) => product.id)).toEqual(['2', '1']);
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -50,5 +50,23 @@ describe('buscarProductosIA', () => {
         headers: expect.objectContaining({ Authorization: 'Bearer test-api-key' }),
       }),
     );
+  });
+});
+
+describe('buscarProductosIA', () => {
+  it('keeps the compatibility facade delegating to GroqAdapter', async () => {
+    process.env.GROQ_API_KEY = 'test-api-key';
+    const fetchMock = global.fetch as ReturnType<typeof vi.fn>;
+
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: '["1"]' } }],
+      }),
+    });
+
+    const result = await buscarProductosIA('notebook', products);
+
+    expect(result.map((product) => product.id)).toEqual(['1']);
   });
 });

@@ -5,7 +5,10 @@ import type {
   ProductQueryFilters,
   ProductUpdateInput,
 } from '../types/product';
-import { buscarProductosIA } from './ai.service';
+import { GroqAdapter } from '../adapters/groq.adapter';
+import type { EstrategiaBusqueda } from '../strategies/busqueda/estrategia-busqueda';
+import { EstrategiaBusquedaBDD } from '../strategies/busqueda/estrategia-busqueda-bdd';
+import { EstrategiaBusquedaIA } from '../strategies/busqueda/estrategia-busqueda-ia';
 
 const categoryMap: Record<string, string> = {
   electronica: 'electrónica',
@@ -29,7 +32,15 @@ interface ProductRecord {
   supplier: { id: number; name: string } | null;
 }
 
+const crearEstrategiaBusquedaDefault = (): EstrategiaBusqueda => {
+  return new EstrategiaBusquedaIA(new GroqAdapter(), new EstrategiaBusquedaBDD());
+};
+
 export class ProductService {
+  constructor(
+    private readonly estrategiaBusqueda: EstrategiaBusqueda = crearEstrategiaBusquedaDefault(),
+  ) {}
+
   private mapProduct(product: ProductRecord): Product {
     const priceValue =
       typeof product.price === 'number' ? product.price : Number(product.price.toNumber());
@@ -143,19 +154,7 @@ export class ProductService {
     );
 
     if (busqueda && busqueda.trim() !== '') {
-      try {
-        productos = await buscarProductosIA(busqueda, productos);
-      } catch (error) {
-        const termino = busqueda.toLowerCase().trim();
-        productos = productos.filter((producto) =>
-          producto.title.toLowerCase().includes(termino) ||
-          producto.description.toLowerCase().includes(termino) ||
-          producto.category.toLowerCase().includes(termino) ||
-          producto.seller.toLowerCase().includes(termino),
-        );
-
-        console.error('AI search failed, using fallback search:', error);
-      }
+      productos = await this.estrategiaBusqueda.buscar(busqueda, productos);
     }
 
     if (categoria && categoria.trim() !== '') {

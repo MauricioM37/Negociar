@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { Link, Route, Routes, useNavigate } from 'react-router-dom';
 import { MainLayout } from './layouts/MainLayout';
 import { AuthLayout } from './layouts/AuthLayout';
@@ -11,10 +11,17 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { SellerDashboard } from './pages/SellerDashboard';
 import { ProductDetailPage } from './pages/ProductDetail';
 
+const SALES_API_URL = 'http://localhost:3001/api/sales';
+
 const CartPage = () => {
   const items = useCartStore((state) => state.items);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const clearCart = useCartStore((state) => state.clearCart);
   const totalPrice = useCartStore((state) => state.totalPrice());
+  const user = useAuthStore((state) => state.user);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [checkoutSuccess, setCheckoutSuccess] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-AR', {
@@ -25,12 +32,56 @@ const CartPage = () => {
     }).format(price);
   };
 
+  const handleCheckout = async () => {
+    setCheckoutError(null);
+    setCheckoutSuccess(null);
+    setCheckoutLoading(true);
+
+    try {
+      const response = await fetch(`${SALES_API_URL}/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user?.id ?? 1,
+          direccion: 'Test',
+          items: items.map(({ product, quantity }) => ({
+            productId: Number(product.id),
+            cantidad: quantity,
+          })),
+        }),
+      });
+
+      if (!response.ok) {
+        let message = 'No pudimos procesar el pago';
+
+        try {
+          const data = (await response.json()) as { message?: string };
+          message = data.message ?? message;
+        } catch {
+          // Keep fallback message when the API does not return JSON.
+        }
+
+        throw new Error(message);
+      }
+
+      setCheckoutSuccess('Venta procesada correctamente');
+      clearCart();
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : 'No pudimos procesar el pago');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">🛒</div>
           <h1 className="text-3xl font-bold text-gray-800 mb-4">Tu carrito está vacío</h1>
+          {checkoutSuccess && <p className="text-green-600 font-semibold mb-3">{checkoutSuccess}</p>}
           <p className="text-gray-500 mb-6">Encontrá miles de productos esperando por vos</p>
           <Link to="/catalog" className="btn-primary inline-block">
             Ver catálogo
@@ -99,11 +150,15 @@ const CartPage = () => {
             <span className="text-gray-600 font-medium">Total</span>
             <span className="text-2xl font-bold text-ml-blue">{formatPrice(totalPrice)}</span>
           </div>
+          {checkoutError && <p className="text-sm text-red-500 mb-3">{checkoutError}</p>}
+          {checkoutSuccess && <p className="text-sm text-green-600 mb-3">{checkoutSuccess}</p>}
           <button
             type="button"
-            className="w-full py-3 bg-[#001D3D] text-white rounded-lg font-semibold hover:bg-blue-900 transition-colors"
+            onClick={handleCheckout}
+            disabled={checkoutLoading}
+            className="w-full py-3 bg-[#001D3D] text-white rounded-lg font-semibold hover:bg-blue-900 transition-colors disabled:opacity-70"
           >
-            Proceder al pago
+            {checkoutLoading ? 'Procesando...' : 'Proceder al pago'}
           </button>
         </div>
       </div>

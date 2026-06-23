@@ -20,6 +20,12 @@
       ],
       "outputs": []
     },
+    "test": {
+      "dependsOn": [
+        "^test"
+      ],
+      "outputs": []
+    },
     "prisma:generate": {
       "dependsOn": [
         "^prisma:generate"
